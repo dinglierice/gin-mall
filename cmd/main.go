@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	// Ek1+Ep1==Ek2+Ep2
 	conf.Init()
 	loading.Loading()
 	r := routes.NewRouter()
