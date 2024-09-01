@@ -24,7 +24,14 @@ func CreateProduct(c *gin.Context) {
 	}
 }
 
-// 商品列表
+// ListProducts godoc
+// @Summary      List products
+// @Description  Get a list of products
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  serializer.Response
+// @Router       /api/v1/products [get]
 func ListProducts(c *gin.Context) {
 	listProductsService := service.ProductService{}
 	if err := c.ShouldBind(&listProductsService); err == nil {

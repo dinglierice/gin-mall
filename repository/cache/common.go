@@ -28,7 +28,8 @@ func Redis() {
 	_, err := client.Ping().Result()
 	if err != nil {
 		logging.Info(err)
-		panic(err)
+		//暂时改动一下，redis连不上先不panic
+		//panic(err)
 	}
 	RedisClient = client
 }

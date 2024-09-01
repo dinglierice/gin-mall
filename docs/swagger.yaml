@@ -1,0 +1,30 @@
+definitions:
+  serializer.Response:
+    properties:
+      data: {}
+      error:
+        type: string
+      msg:
+        type: string
+      status:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/products:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.Response'
+      summary: List products
+      tags:
+      - products
+swagger: "2.0"
