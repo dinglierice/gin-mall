@@ -31,6 +31,10 @@ func (service PsConfigService) List(ctx context.Context) interface{} {
 	// 查询条件，待添加
 	condition := make(map[string]interface{})
 
+	if service.PageSize == 0 {
+		service.PageSize = 15
+	}
+
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func() {

@@ -37,6 +37,29 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/ps_configs": {
+            "get": {
+                "description": "Get a list of psConfig",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "psConfigs"
+                ],
+                "summary": "List psConfigs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

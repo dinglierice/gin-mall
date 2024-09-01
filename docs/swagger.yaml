@@ -27,4 +27,19 @@ paths:
       summary: List products
       tags:
       - products
+  /api/v1/ps_configs:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of psConfig
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.Response'
+      summary: List psConfigs
+      tags:
+      - psConfigs
 swagger: "2.0"

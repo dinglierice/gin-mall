@@ -38,7 +38,7 @@ func NewRouter() *gin.Engine {
 		v1.GET("carousels", api.ListCarousels)   // 轮播图
 
 		// 脚本操作
-		v1.GET("ps_config", api.ListPsConfig)
+		v1.GET("ps_configs", api.ListPsConfig)
 
 		authed := v1.Group("/") // 需要登陆保护
 		authed.Use(middleware.JWT())
