@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"mall/ent/psconfig"
-	"mall/ent/psstrategy"
 	"strings"
 	"time"
 
@@ -17,13 +16,12 @@ import (
 type PsConfig struct {
 	config `json:"-"`
 	// ID of the ent.
+	// 主键
 	ID int `json:"id,omitempty"`
 	// CreateTime holds the value of the "create_time" field.
 	CreateTime time.Time `json:"create_time,omitempty"`
 	// UpdateTime holds the value of the "update_time" field.
 	UpdateTime time.Time `json:"update_time,omitempty"`
-	// 主键
-	PsID int `json:"ps_id,omitempty"`
 	// 场景
 	PsScene string `json:"ps_scene,omitempty"`
 	// 过滤策略
@@ -41,31 +39,8 @@ type PsConfig struct {
 	// Managers holds the value of the "managers" field.
 	Managers *string `json:"managers,omitempty"`
 	// UpdateUser holds the value of the "update_user" field.
-	UpdateUser *int `json:"update_user,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the PsConfigQuery when eager-loading is set.
-	Edges        PsConfigEdges `json:"edges"`
+	UpdateUser   *int `json:"update_user,omitempty"`
 	selectValues sql.SelectValues
-}
-
-// PsConfigEdges holds the relations/edges for other nodes in the graph.
-type PsConfigEdges struct {
-	// 关联的策略脚本
-	Strategy *PsStrategy `json:"strategy,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-}
-
-// StrategyOrErr returns the Strategy value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e PsConfigEdges) StrategyOrErr() (*PsStrategy, error) {
-	if e.Strategy != nil {
-		return e.Strategy, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: psstrategy.Label}
-	}
-	return nil, &NotLoadedError{edge: "strategy"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -73,7 +48,7 @@ func (*PsConfig) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case psconfig.FieldID, psconfig.FieldPsID, psconfig.FieldPsFilter, psconfig.FieldPsMessage, psconfig.FieldPsEvent, psconfig.FieldPsFeature, psconfig.FieldPsStrategy, psconfig.FieldOwnerID, psconfig.FieldUpdateUser:
+		case psconfig.FieldID, psconfig.FieldPsFilter, psconfig.FieldPsMessage, psconfig.FieldPsEvent, psconfig.FieldPsFeature, psconfig.FieldPsStrategy, psconfig.FieldOwnerID, psconfig.FieldUpdateUser:
 			values[i] = new(sql.NullInt64)
 		case psconfig.FieldPsScene, psconfig.FieldManagers:
 			values[i] = new(sql.NullString)
@@ -111,12 +86,6 @@ func (pc *PsConfig) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
 				pc.UpdateTime = value.Time
-			}
-		case psconfig.FieldPsID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ps_id", values[i])
-			} else if value.Valid {
-				pc.PsID = int(value.Int64)
 			}
 		case psconfig.FieldPsScene:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -192,11 +161,6 @@ func (pc *PsConfig) Value(name string) (ent.Value, error) {
 	return pc.selectValues.Get(name)
 }
 
-// QueryStrategy queries the "strategy" edge of the PsConfig entity.
-func (pc *PsConfig) QueryStrategy() *PsStrategyQuery {
-	return NewPsConfigClient(pc.config).QueryStrategy(pc)
-}
-
 // Update returns a builder for updating this PsConfig.
 // Note that you need to call PsConfig.Unwrap() before calling this method if this PsConfig
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -225,9 +189,6 @@ func (pc *PsConfig) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("update_time=")
 	builder.WriteString(pc.UpdateTime.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("ps_id=")
-	builder.WriteString(fmt.Sprintf("%v", pc.PsID))
 	builder.WriteString(", ")
 	builder.WriteString("ps_scene=")
 	builder.WriteString(pc.PsScene)

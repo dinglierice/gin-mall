@@ -2,7 +2,8 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/dialect/entsql"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 )
@@ -14,7 +15,8 @@ type PsConfig struct {
 // Fields of the PsConfig.
 func (PsConfig) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("ps_id").
+		field.Int("id").
+			StorageKey("ps_id").
 			Positive().
 			Unique().
 			Immutable().
@@ -54,14 +56,14 @@ func (PsConfig) Fields() []ent.Field {
 }
 
 // Edges of the PsConfig.
-func (PsConfig) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("strategy", PsStrategy.Type).
-			Unique().
-			Field("ps_strategy").
-			Comment("关联的策略脚本"),
-	}
-}
+//func (PsConfig) Edges() []ent.Edge {
+//	return []ent.Edge{
+//		edge.To("strategy", PsStrategy.Type).
+//			Unique().
+//			Field("ps_strategy").
+//			Comment("关联的策略脚本"),
+//	}
+//}
 
 // Mixin of the PsConfig.
 func (PsConfig) Mixin() []ent.Mixin {
@@ -74,5 +76,11 @@ func (PsConfig) Mixin() []ent.Mixin {
 func (PsConfig) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("ps_scene").Unique(),
+	}
+}
+
+func (PsConfig) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entsql.Annotation{Table: "ps_config"},
 	}
 }

@@ -28,14 +28,14 @@ func init() {
 	psconfig.DefaultUpdateTime = psconfigDescUpdateTime.Default.(func() time.Time)
 	// psconfig.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
 	psconfig.UpdateDefaultUpdateTime = psconfigDescUpdateTime.UpdateDefault.(func() time.Time)
-	// psconfigDescPsID is the schema descriptor for ps_id field.
-	psconfigDescPsID := psconfigFields[0].Descriptor()
-	// psconfig.PsIDValidator is a validator for the "ps_id" field. It is called by the builders before save.
-	psconfig.PsIDValidator = psconfigDescPsID.Validators[0].(func(int) error)
 	// psconfigDescPsScene is the schema descriptor for ps_scene field.
 	psconfigDescPsScene := psconfigFields[1].Descriptor()
 	// psconfig.PsSceneValidator is a validator for the "ps_scene" field. It is called by the builders before save.
 	psconfig.PsSceneValidator = psconfigDescPsScene.Validators[0].(func(string) error)
+	// psconfigDescID is the schema descriptor for id field.
+	psconfigDescID := psconfigFields[0].Descriptor()
+	// psconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	psconfig.IDValidator = psconfigDescID.Validators[0].(func(int) error)
 	psstrategyMixin := schema.PsStrategy{}.Mixin()
 	psstrategyMixinFields0 := psstrategyMixin[0].Fields()
 	_ = psstrategyMixinFields0

@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"mall/ent/predicate"
 	"mall/ent/psconfig"
-	"mall/ent/psstrategy"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -153,6 +152,7 @@ func (pcu *PsConfigUpdate) ClearPsFeature() *PsConfigUpdate {
 
 // SetPsStrategy sets the "ps_strategy" field.
 func (pcu *PsConfigUpdate) SetPsStrategy(i int) *PsConfigUpdate {
+	pcu.mutation.ResetPsStrategy()
 	pcu.mutation.SetPsStrategy(i)
 	return pcu
 }
@@ -162,6 +162,12 @@ func (pcu *PsConfigUpdate) SetNillablePsStrategy(i *int) *PsConfigUpdate {
 	if i != nil {
 		pcu.SetPsStrategy(*i)
 	}
+	return pcu
+}
+
+// AddPsStrategy adds i to the "ps_strategy" field.
+func (pcu *PsConfigUpdate) AddPsStrategy(i int) *PsConfigUpdate {
+	pcu.mutation.AddPsStrategy(i)
 	return pcu
 }
 
@@ -245,34 +251,9 @@ func (pcu *PsConfigUpdate) ClearUpdateUser() *PsConfigUpdate {
 	return pcu
 }
 
-// SetStrategyID sets the "strategy" edge to the PsStrategy entity by ID.
-func (pcu *PsConfigUpdate) SetStrategyID(id int) *PsConfigUpdate {
-	pcu.mutation.SetStrategyID(id)
-	return pcu
-}
-
-// SetNillableStrategyID sets the "strategy" edge to the PsStrategy entity by ID if the given value is not nil.
-func (pcu *PsConfigUpdate) SetNillableStrategyID(id *int) *PsConfigUpdate {
-	if id != nil {
-		pcu = pcu.SetStrategyID(*id)
-	}
-	return pcu
-}
-
-// SetStrategy sets the "strategy" edge to the PsStrategy entity.
-func (pcu *PsConfigUpdate) SetStrategy(p *PsStrategy) *PsConfigUpdate {
-	return pcu.SetStrategyID(p.ID)
-}
-
 // Mutation returns the PsConfigMutation object of the builder.
 func (pcu *PsConfigUpdate) Mutation() *PsConfigMutation {
 	return pcu.mutation
-}
-
-// ClearStrategy clears the "strategy" edge to the PsStrategy entity.
-func (pcu *PsConfigUpdate) ClearStrategy() *PsConfigUpdate {
-	pcu.mutation.ClearStrategy()
-	return pcu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -372,6 +353,15 @@ func (pcu *PsConfigUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if pcu.mutation.PsFeatureCleared() {
 		_spec.ClearField(psconfig.FieldPsFeature, field.TypeInt)
 	}
+	if value, ok := pcu.mutation.PsStrategy(); ok {
+		_spec.SetField(psconfig.FieldPsStrategy, field.TypeInt, value)
+	}
+	if value, ok := pcu.mutation.AddedPsStrategy(); ok {
+		_spec.AddField(psconfig.FieldPsStrategy, field.TypeInt, value)
+	}
+	if pcu.mutation.PsStrategyCleared() {
+		_spec.ClearField(psconfig.FieldPsStrategy, field.TypeInt)
+	}
 	if value, ok := pcu.mutation.OwnerID(); ok {
 		_spec.SetField(psconfig.FieldOwnerID, field.TypeInt, value)
 	}
@@ -395,35 +385,6 @@ func (pcu *PsConfigUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pcu.mutation.UpdateUserCleared() {
 		_spec.ClearField(psconfig.FieldUpdateUser, field.TypeInt)
-	}
-	if pcu.mutation.StrategyCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   psconfig.StrategyTable,
-			Columns: []string{psconfig.StrategyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(psstrategy.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pcu.mutation.StrategyIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   psconfig.StrategyTable,
-			Columns: []string{psconfig.StrategyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(psstrategy.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -569,6 +530,7 @@ func (pcuo *PsConfigUpdateOne) ClearPsFeature() *PsConfigUpdateOne {
 
 // SetPsStrategy sets the "ps_strategy" field.
 func (pcuo *PsConfigUpdateOne) SetPsStrategy(i int) *PsConfigUpdateOne {
+	pcuo.mutation.ResetPsStrategy()
 	pcuo.mutation.SetPsStrategy(i)
 	return pcuo
 }
@@ -578,6 +540,12 @@ func (pcuo *PsConfigUpdateOne) SetNillablePsStrategy(i *int) *PsConfigUpdateOne 
 	if i != nil {
 		pcuo.SetPsStrategy(*i)
 	}
+	return pcuo
+}
+
+// AddPsStrategy adds i to the "ps_strategy" field.
+func (pcuo *PsConfigUpdateOne) AddPsStrategy(i int) *PsConfigUpdateOne {
+	pcuo.mutation.AddPsStrategy(i)
 	return pcuo
 }
 
@@ -661,34 +629,9 @@ func (pcuo *PsConfigUpdateOne) ClearUpdateUser() *PsConfigUpdateOne {
 	return pcuo
 }
 
-// SetStrategyID sets the "strategy" edge to the PsStrategy entity by ID.
-func (pcuo *PsConfigUpdateOne) SetStrategyID(id int) *PsConfigUpdateOne {
-	pcuo.mutation.SetStrategyID(id)
-	return pcuo
-}
-
-// SetNillableStrategyID sets the "strategy" edge to the PsStrategy entity by ID if the given value is not nil.
-func (pcuo *PsConfigUpdateOne) SetNillableStrategyID(id *int) *PsConfigUpdateOne {
-	if id != nil {
-		pcuo = pcuo.SetStrategyID(*id)
-	}
-	return pcuo
-}
-
-// SetStrategy sets the "strategy" edge to the PsStrategy entity.
-func (pcuo *PsConfigUpdateOne) SetStrategy(p *PsStrategy) *PsConfigUpdateOne {
-	return pcuo.SetStrategyID(p.ID)
-}
-
 // Mutation returns the PsConfigMutation object of the builder.
 func (pcuo *PsConfigUpdateOne) Mutation() *PsConfigMutation {
 	return pcuo.mutation
-}
-
-// ClearStrategy clears the "strategy" edge to the PsStrategy entity.
-func (pcuo *PsConfigUpdateOne) ClearStrategy() *PsConfigUpdateOne {
-	pcuo.mutation.ClearStrategy()
-	return pcuo
 }
 
 // Where appends a list predicates to the PsConfigUpdate builder.
@@ -818,6 +761,15 @@ func (pcuo *PsConfigUpdateOne) sqlSave(ctx context.Context) (_node *PsConfig, er
 	if pcuo.mutation.PsFeatureCleared() {
 		_spec.ClearField(psconfig.FieldPsFeature, field.TypeInt)
 	}
+	if value, ok := pcuo.mutation.PsStrategy(); ok {
+		_spec.SetField(psconfig.FieldPsStrategy, field.TypeInt, value)
+	}
+	if value, ok := pcuo.mutation.AddedPsStrategy(); ok {
+		_spec.AddField(psconfig.FieldPsStrategy, field.TypeInt, value)
+	}
+	if pcuo.mutation.PsStrategyCleared() {
+		_spec.ClearField(psconfig.FieldPsStrategy, field.TypeInt)
+	}
 	if value, ok := pcuo.mutation.OwnerID(); ok {
 		_spec.SetField(psconfig.FieldOwnerID, field.TypeInt, value)
 	}
@@ -841,35 +793,6 @@ func (pcuo *PsConfigUpdateOne) sqlSave(ctx context.Context) (_node *PsConfig, er
 	}
 	if pcuo.mutation.UpdateUserCleared() {
 		_spec.ClearField(psconfig.FieldUpdateUser, field.TypeInt)
-	}
-	if pcuo.mutation.StrategyCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   psconfig.StrategyTable,
-			Columns: []string{psconfig.StrategyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(psstrategy.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pcuo.mutation.StrategyIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   psconfig.StrategyTable,
-			Columns: []string{psconfig.StrategyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(psstrategy.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &PsConfig{config: pcuo.config}
 	_spec.Assign = _node.assignValues

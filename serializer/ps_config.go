@@ -37,7 +37,7 @@ func BuildPsConfig(item *model.PsConfig) PsConfig {
 
 func BuildPsConfig2(item *ent.PsConfig) PsConfig {
 	return PsConfig{
-		PsID:       item.PsID,
+		PsID:       item.ID,
 		PSName:     item.PsScene,
 		PSFilter:   item.PsFilter,
 		PSMessage:  item.PsMessage,

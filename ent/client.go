@@ -17,7 +17,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -314,22 +313,6 @@ func (c *PsConfigClient) GetX(ctx context.Context, id int) *PsConfig {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryStrategy queries the strategy edge of a PsConfig.
-func (c *PsConfigClient) QueryStrategy(pc *PsConfig) *PsStrategyQuery {
-	query := (&PsStrategyClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(psconfig.Table, psconfig.FieldID, id),
-			sqlgraph.To(psstrategy.Table, psstrategy.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, psconfig.StrategyTable, psconfig.StrategyColumn),
-		)
-		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.

@@ -6,20 +6,17 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
 	// Label holds the string label denoting the psconfig type in the database.
 	Label = "ps_config"
 	// FieldID holds the string denoting the id field in the database.
-	FieldID = "id"
+	FieldID = "ps_id"
 	// FieldCreateTime holds the string denoting the create_time field in the database.
 	FieldCreateTime = "create_time"
 	// FieldUpdateTime holds the string denoting the update_time field in the database.
 	FieldUpdateTime = "update_time"
-	// FieldPsID holds the string denoting the ps_id field in the database.
-	FieldPsID = "ps_id"
 	// FieldPsScene holds the string denoting the ps_scene field in the database.
 	FieldPsScene = "ps_scene"
 	// FieldPsFilter holds the string denoting the ps_filter field in the database.
@@ -38,17 +35,8 @@ const (
 	FieldManagers = "managers"
 	// FieldUpdateUser holds the string denoting the update_user field in the database.
 	FieldUpdateUser = "update_user"
-	// EdgeStrategy holds the string denoting the strategy edge name in mutations.
-	EdgeStrategy = "strategy"
 	// Table holds the table name of the psconfig in the database.
-	Table = "ps_configs"
-	// StrategyTable is the table that holds the strategy relation/edge.
-	StrategyTable = "ps_configs"
-	// StrategyInverseTable is the table name for the PsStrategy entity.
-	// It exists in this package in order to avoid circular dependency with the "psstrategy" package.
-	StrategyInverseTable = "ps_strategies"
-	// StrategyColumn is the table column denoting the strategy relation/edge.
-	StrategyColumn = "ps_strategy"
+	Table = "ps_config"
 )
 
 // Columns holds all SQL columns for psconfig fields.
@@ -56,7 +44,6 @@ var Columns = []string{
 	FieldID,
 	FieldCreateTime,
 	FieldUpdateTime,
-	FieldPsID,
 	FieldPsScene,
 	FieldPsFilter,
 	FieldPsMessage,
@@ -85,10 +72,10 @@ var (
 	DefaultUpdateTime func() time.Time
 	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
 	UpdateDefaultUpdateTime func() time.Time
-	// PsIDValidator is a validator for the "ps_id" field. It is called by the builders before save.
-	PsIDValidator func(int) error
 	// PsSceneValidator is a validator for the "ps_scene" field. It is called by the builders before save.
 	PsSceneValidator func(string) error
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the PsConfig queries.
@@ -107,11 +94,6 @@ func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdateTime orders the results by the update_time field.
 func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
-}
-
-// ByPsID orders the results by the ps_id field.
-func ByPsID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPsID, opts...).ToFunc()
 }
 
 // ByPsScene orders the results by the ps_scene field.
@@ -157,18 +139,4 @@ func ByManagers(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdateUser orders the results by the update_user field.
 func ByUpdateUser(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdateUser, opts...).ToFunc()
-}
-
-// ByStrategyField orders the results by strategy field.
-func ByStrategyField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newStrategyStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newStrategyStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(StrategyInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, StrategyTable, StrategyColumn),
-	)
 }

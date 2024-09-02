@@ -3,45 +3,37 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
 
 var (
-	// PsConfigsColumns holds the columns for the "ps_configs" table.
-	PsConfigsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+	// PsConfigColumns holds the columns for the "ps_config" table.
+	PsConfigColumns = []*schema.Column{
+		{Name: "ps_id", Type: field.TypeInt, Increment: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
-		{Name: "ps_id", Type: field.TypeInt, Unique: true},
 		{Name: "ps_scene", Type: field.TypeString, Unique: true},
 		{Name: "ps_filter", Type: field.TypeInt},
 		{Name: "ps_message", Type: field.TypeInt, Nullable: true},
 		{Name: "ps_event", Type: field.TypeInt, Nullable: true},
 		{Name: "ps_feature", Type: field.TypeInt, Nullable: true},
+		{Name: "ps_strategy", Type: field.TypeInt, Nullable: true},
 		{Name: "owner_id", Type: field.TypeInt, Nullable: true},
 		{Name: "managers", Type: field.TypeString, Nullable: true},
 		{Name: "update_user", Type: field.TypeInt, Nullable: true},
-		{Name: "ps_strategy", Type: field.TypeInt, Nullable: true},
 	}
-	// PsConfigsTable holds the schema information for the "ps_configs" table.
-	PsConfigsTable = &schema.Table{
-		Name:       "ps_configs",
-		Columns:    PsConfigsColumns,
-		PrimaryKey: []*schema.Column{PsConfigsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "ps_configs_ps_strategies_strategy",
-				Columns:    []*schema.Column{PsConfigsColumns[12]},
-				RefColumns: []*schema.Column{PsStrategiesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
+	// PsConfigTable holds the schema information for the "ps_config" table.
+	PsConfigTable = &schema.Table{
+		Name:       "ps_config",
+		Columns:    PsConfigColumns,
+		PrimaryKey: []*schema.Column{PsConfigColumns[0]},
 		Indexes: []*schema.Index{
 			{
 				Name:    "psconfig_ps_scene",
 				Unique:  true,
-				Columns: []*schema.Column{PsConfigsColumns[4]},
+				Columns: []*schema.Column{PsConfigColumns[3]},
 			},
 		},
 	}
@@ -62,11 +54,13 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		PsConfigsTable,
+		PsConfigTable,
 		PsStrategiesTable,
 	}
 )
 
 func init() {
-	PsConfigsTable.ForeignKeys[0].RefTable = PsStrategiesTable
+	PsConfigTable.Annotation = &entsql.Annotation{
+		Table: "ps_config",
+	}
 }

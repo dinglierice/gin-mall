@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -63,11 +62,6 @@ func CreateTime(v time.Time) predicate.PsConfig {
 // UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
 func UpdateTime(v time.Time) predicate.PsConfig {
 	return predicate.PsConfig(sql.FieldEQ(FieldUpdateTime, v))
-}
-
-// PsID applies equality check predicate on the "ps_id" field. It's identical to PsIDEQ.
-func PsID(v int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldEQ(FieldPsID, v))
 }
 
 // PsScene applies equality check predicate on the "ps_scene" field. It's identical to PsSceneEQ.
@@ -193,46 +187,6 @@ func UpdateTimeLT(v time.Time) predicate.PsConfig {
 // UpdateTimeLTE applies the LTE predicate on the "update_time" field.
 func UpdateTimeLTE(v time.Time) predicate.PsConfig {
 	return predicate.PsConfig(sql.FieldLTE(FieldUpdateTime, v))
-}
-
-// PsIDEQ applies the EQ predicate on the "ps_id" field.
-func PsIDEQ(v int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldEQ(FieldPsID, v))
-}
-
-// PsIDNEQ applies the NEQ predicate on the "ps_id" field.
-func PsIDNEQ(v int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldNEQ(FieldPsID, v))
-}
-
-// PsIDIn applies the In predicate on the "ps_id" field.
-func PsIDIn(vs ...int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldIn(FieldPsID, vs...))
-}
-
-// PsIDNotIn applies the NotIn predicate on the "ps_id" field.
-func PsIDNotIn(vs ...int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldNotIn(FieldPsID, vs...))
-}
-
-// PsIDGT applies the GT predicate on the "ps_id" field.
-func PsIDGT(v int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldGT(FieldPsID, v))
-}
-
-// PsIDGTE applies the GTE predicate on the "ps_id" field.
-func PsIDGTE(v int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldGTE(FieldPsID, v))
-}
-
-// PsIDLT applies the LT predicate on the "ps_id" field.
-func PsIDLT(v int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldLT(FieldPsID, v))
-}
-
-// PsIDLTE applies the LTE predicate on the "ps_id" field.
-func PsIDLTE(v int) predicate.PsConfig {
-	return predicate.PsConfig(sql.FieldLTE(FieldPsID, v))
 }
 
 // PsSceneEQ applies the EQ predicate on the "ps_scene" field.
@@ -510,6 +464,26 @@ func PsStrategyNotIn(vs ...int) predicate.PsConfig {
 	return predicate.PsConfig(sql.FieldNotIn(FieldPsStrategy, vs...))
 }
 
+// PsStrategyGT applies the GT predicate on the "ps_strategy" field.
+func PsStrategyGT(v int) predicate.PsConfig {
+	return predicate.PsConfig(sql.FieldGT(FieldPsStrategy, v))
+}
+
+// PsStrategyGTE applies the GTE predicate on the "ps_strategy" field.
+func PsStrategyGTE(v int) predicate.PsConfig {
+	return predicate.PsConfig(sql.FieldGTE(FieldPsStrategy, v))
+}
+
+// PsStrategyLT applies the LT predicate on the "ps_strategy" field.
+func PsStrategyLT(v int) predicate.PsConfig {
+	return predicate.PsConfig(sql.FieldLT(FieldPsStrategy, v))
+}
+
+// PsStrategyLTE applies the LTE predicate on the "ps_strategy" field.
+func PsStrategyLTE(v int) predicate.PsConfig {
+	return predicate.PsConfig(sql.FieldLTE(FieldPsStrategy, v))
+}
+
 // PsStrategyIsNil applies the IsNil predicate on the "ps_strategy" field.
 func PsStrategyIsNil() predicate.PsConfig {
 	return predicate.PsConfig(sql.FieldIsNull(FieldPsStrategy))
@@ -693,29 +667,6 @@ func UpdateUserIsNil() predicate.PsConfig {
 // UpdateUserNotNil applies the NotNil predicate on the "update_user" field.
 func UpdateUserNotNil() predicate.PsConfig {
 	return predicate.PsConfig(sql.FieldNotNull(FieldUpdateUser))
-}
-
-// HasStrategy applies the HasEdge predicate on the "strategy" edge.
-func HasStrategy() predicate.PsConfig {
-	return predicate.PsConfig(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, StrategyTable, StrategyColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStrategyWith applies the HasEdge predicate on the "strategy" edge with a given conditions (other predicates).
-func HasStrategyWith(preds ...predicate.PsStrategy) predicate.PsConfig {
-	return predicate.PsConfig(func(s *sql.Selector) {
-		step := newStrategyStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -54,11 +54,10 @@ func (service PsConfigService) List2(ctx context.Context) interface{} {
 	if service.PageSize == 0 {
 		service.PageSize = 15
 	}
-
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func() {
-		configs, _ = entcl.GetPaginatedPsConfigs(ctx, service.PageNum, service.PageSize)
+		configs, _ = entcl.GetPaginatedPsConfigs(ctx, service.PageSize, service.PageNum)
 		wg.Done()
 	}()
 	wg.Wait()

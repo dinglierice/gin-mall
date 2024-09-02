@@ -32,33 +32,31 @@ const (
 // PsConfigMutation represents an operation that mutates the PsConfig nodes in the graph.
 type PsConfigMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	create_time     *time.Time
-	update_time     *time.Time
-	ps_id           *int
-	addps_id        *int
-	ps_scene        *string
-	ps_filter       *int
-	addps_filter    *int
-	ps_message      *int
-	addps_message   *int
-	ps_event        *int
-	addps_event     *int
-	ps_feature      *int
-	addps_feature   *int
-	owner_id        *int
-	addowner_id     *int
-	managers        *string
-	update_user     *int
-	addupdate_user  *int
-	clearedFields   map[string]struct{}
-	strategy        *int
-	clearedstrategy bool
-	done            bool
-	oldValue        func(context.Context) (*PsConfig, error)
-	predicates      []predicate.PsConfig
+	op             Op
+	typ            string
+	id             *int
+	create_time    *time.Time
+	update_time    *time.Time
+	ps_scene       *string
+	ps_filter      *int
+	addps_filter   *int
+	ps_message     *int
+	addps_message  *int
+	ps_event       *int
+	addps_event    *int
+	ps_feature     *int
+	addps_feature  *int
+	ps_strategy    *int
+	addps_strategy *int
+	owner_id       *int
+	addowner_id    *int
+	managers       *string
+	update_user    *int
+	addupdate_user *int
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*PsConfig, error)
+	predicates     []predicate.PsConfig
 }
 
 var _ ent.Mutation = (*PsConfigMutation)(nil)
@@ -129,6 +127,12 @@ func (m PsConfigMutation) Tx() (*Tx, error) {
 	tx := &Tx{config: m.config}
 	tx.init()
 	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of PsConfig entities.
+func (m *PsConfigMutation) SetID(id int) {
+	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
@@ -229,62 +233,6 @@ func (m *PsConfigMutation) OldUpdateTime(ctx context.Context) (v time.Time, err 
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *PsConfigMutation) ResetUpdateTime() {
 	m.update_time = nil
-}
-
-// SetPsID sets the "ps_id" field.
-func (m *PsConfigMutation) SetPsID(i int) {
-	m.ps_id = &i
-	m.addps_id = nil
-}
-
-// PsID returns the value of the "ps_id" field in the mutation.
-func (m *PsConfigMutation) PsID() (r int, exists bool) {
-	v := m.ps_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPsID returns the old "ps_id" field's value of the PsConfig entity.
-// If the PsConfig object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PsConfigMutation) OldPsID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPsID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPsID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPsID: %w", err)
-	}
-	return oldValue.PsID, nil
-}
-
-// AddPsID adds i to the "ps_id" field.
-func (m *PsConfigMutation) AddPsID(i int) {
-	if m.addps_id != nil {
-		*m.addps_id += i
-	} else {
-		m.addps_id = &i
-	}
-}
-
-// AddedPsID returns the value that was added to the "ps_id" field in this mutation.
-func (m *PsConfigMutation) AddedPsID() (r int, exists bool) {
-	v := m.addps_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetPsID resets all changes to the "ps_id" field.
-func (m *PsConfigMutation) ResetPsID() {
-	m.ps_id = nil
-	m.addps_id = nil
 }
 
 // SetPsScene sets the "ps_scene" field.
@@ -591,12 +539,13 @@ func (m *PsConfigMutation) ResetPsFeature() {
 
 // SetPsStrategy sets the "ps_strategy" field.
 func (m *PsConfigMutation) SetPsStrategy(i int) {
-	m.strategy = &i
+	m.ps_strategy = &i
+	m.addps_strategy = nil
 }
 
 // PsStrategy returns the value of the "ps_strategy" field in the mutation.
 func (m *PsConfigMutation) PsStrategy() (r int, exists bool) {
-	v := m.strategy
+	v := m.ps_strategy
 	if v == nil {
 		return
 	}
@@ -620,9 +569,28 @@ func (m *PsConfigMutation) OldPsStrategy(ctx context.Context) (v *int, err error
 	return oldValue.PsStrategy, nil
 }
 
+// AddPsStrategy adds i to the "ps_strategy" field.
+func (m *PsConfigMutation) AddPsStrategy(i int) {
+	if m.addps_strategy != nil {
+		*m.addps_strategy += i
+	} else {
+		m.addps_strategy = &i
+	}
+}
+
+// AddedPsStrategy returns the value that was added to the "ps_strategy" field in this mutation.
+func (m *PsConfigMutation) AddedPsStrategy() (r int, exists bool) {
+	v := m.addps_strategy
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ClearPsStrategy clears the value of the "ps_strategy" field.
 func (m *PsConfigMutation) ClearPsStrategy() {
-	m.strategy = nil
+	m.ps_strategy = nil
+	m.addps_strategy = nil
 	m.clearedFields[psconfig.FieldPsStrategy] = struct{}{}
 }
 
@@ -634,7 +602,8 @@ func (m *PsConfigMutation) PsStrategyCleared() bool {
 
 // ResetPsStrategy resets all changes to the "ps_strategy" field.
 func (m *PsConfigMutation) ResetPsStrategy() {
-	m.strategy = nil
+	m.ps_strategy = nil
+	m.addps_strategy = nil
 	delete(m.clearedFields, psconfig.FieldPsStrategy)
 }
 
@@ -827,46 +796,6 @@ func (m *PsConfigMutation) ResetUpdateUser() {
 	delete(m.clearedFields, psconfig.FieldUpdateUser)
 }
 
-// SetStrategyID sets the "strategy" edge to the PsStrategy entity by id.
-func (m *PsConfigMutation) SetStrategyID(id int) {
-	m.strategy = &id
-}
-
-// ClearStrategy clears the "strategy" edge to the PsStrategy entity.
-func (m *PsConfigMutation) ClearStrategy() {
-	m.clearedstrategy = true
-	m.clearedFields[psconfig.FieldPsStrategy] = struct{}{}
-}
-
-// StrategyCleared reports if the "strategy" edge to the PsStrategy entity was cleared.
-func (m *PsConfigMutation) StrategyCleared() bool {
-	return m.PsStrategyCleared() || m.clearedstrategy
-}
-
-// StrategyID returns the "strategy" edge ID in the mutation.
-func (m *PsConfigMutation) StrategyID() (id int, exists bool) {
-	if m.strategy != nil {
-		return *m.strategy, true
-	}
-	return
-}
-
-// StrategyIDs returns the "strategy" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// StrategyID instead. It exists only for internal usage by the builders.
-func (m *PsConfigMutation) StrategyIDs() (ids []int) {
-	if id := m.strategy; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetStrategy resets all changes to the "strategy" edge.
-func (m *PsConfigMutation) ResetStrategy() {
-	m.strategy = nil
-	m.clearedstrategy = false
-}
-
 // Where appends a list predicates to the PsConfigMutation builder.
 func (m *PsConfigMutation) Where(ps ...predicate.PsConfig) {
 	m.predicates = append(m.predicates, ps...)
@@ -901,15 +830,12 @@ func (m *PsConfigMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PsConfigMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 11)
 	if m.create_time != nil {
 		fields = append(fields, psconfig.FieldCreateTime)
 	}
 	if m.update_time != nil {
 		fields = append(fields, psconfig.FieldUpdateTime)
-	}
-	if m.ps_id != nil {
-		fields = append(fields, psconfig.FieldPsID)
 	}
 	if m.ps_scene != nil {
 		fields = append(fields, psconfig.FieldPsScene)
@@ -926,7 +852,7 @@ func (m *PsConfigMutation) Fields() []string {
 	if m.ps_feature != nil {
 		fields = append(fields, psconfig.FieldPsFeature)
 	}
-	if m.strategy != nil {
+	if m.ps_strategy != nil {
 		fields = append(fields, psconfig.FieldPsStrategy)
 	}
 	if m.owner_id != nil {
@@ -950,8 +876,6 @@ func (m *PsConfigMutation) Field(name string) (ent.Value, bool) {
 		return m.CreateTime()
 	case psconfig.FieldUpdateTime:
 		return m.UpdateTime()
-	case psconfig.FieldPsID:
-		return m.PsID()
 	case psconfig.FieldPsScene:
 		return m.PsScene()
 	case psconfig.FieldPsFilter:
@@ -983,8 +907,6 @@ func (m *PsConfigMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldCreateTime(ctx)
 	case psconfig.FieldUpdateTime:
 		return m.OldUpdateTime(ctx)
-	case psconfig.FieldPsID:
-		return m.OldPsID(ctx)
 	case psconfig.FieldPsScene:
 		return m.OldPsScene(ctx)
 	case psconfig.FieldPsFilter:
@@ -1025,13 +947,6 @@ func (m *PsConfigMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdateTime(v)
-		return nil
-	case psconfig.FieldPsID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPsID(v)
 		return nil
 	case psconfig.FieldPsScene:
 		v, ok := value.(string)
@@ -1104,9 +1019,6 @@ func (m *PsConfigMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *PsConfigMutation) AddedFields() []string {
 	var fields []string
-	if m.addps_id != nil {
-		fields = append(fields, psconfig.FieldPsID)
-	}
 	if m.addps_filter != nil {
 		fields = append(fields, psconfig.FieldPsFilter)
 	}
@@ -1118,6 +1030,9 @@ func (m *PsConfigMutation) AddedFields() []string {
 	}
 	if m.addps_feature != nil {
 		fields = append(fields, psconfig.FieldPsFeature)
+	}
+	if m.addps_strategy != nil {
+		fields = append(fields, psconfig.FieldPsStrategy)
 	}
 	if m.addowner_id != nil {
 		fields = append(fields, psconfig.FieldOwnerID)
@@ -1133,8 +1048,6 @@ func (m *PsConfigMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *PsConfigMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case psconfig.FieldPsID:
-		return m.AddedPsID()
 	case psconfig.FieldPsFilter:
 		return m.AddedPsFilter()
 	case psconfig.FieldPsMessage:
@@ -1143,6 +1056,8 @@ func (m *PsConfigMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedPsEvent()
 	case psconfig.FieldPsFeature:
 		return m.AddedPsFeature()
+	case psconfig.FieldPsStrategy:
+		return m.AddedPsStrategy()
 	case psconfig.FieldOwnerID:
 		return m.AddedOwnerID()
 	case psconfig.FieldUpdateUser:
@@ -1156,13 +1071,6 @@ func (m *PsConfigMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *PsConfigMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case psconfig.FieldPsID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddPsID(v)
-		return nil
 	case psconfig.FieldPsFilter:
 		v, ok := value.(int)
 		if !ok {
@@ -1190,6 +1098,13 @@ func (m *PsConfigMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddPsFeature(v)
+		return nil
+	case psconfig.FieldPsStrategy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPsStrategy(v)
 		return nil
 	case psconfig.FieldOwnerID:
 		v, ok := value.(int)
@@ -1283,9 +1198,6 @@ func (m *PsConfigMutation) ResetField(name string) error {
 	case psconfig.FieldUpdateTime:
 		m.ResetUpdateTime()
 		return nil
-	case psconfig.FieldPsID:
-		m.ResetPsID()
-		return nil
 	case psconfig.FieldPsScene:
 		m.ResetPsScene()
 		return nil
@@ -1319,28 +1231,19 @@ func (m *PsConfigMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PsConfigMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.strategy != nil {
-		edges = append(edges, psconfig.EdgeStrategy)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *PsConfigMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case psconfig.EdgeStrategy:
-		if id := m.strategy; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PsConfigMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
@@ -1352,42 +1255,25 @@ func (m *PsConfigMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PsConfigMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedstrategy {
-		edges = append(edges, psconfig.EdgeStrategy)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *PsConfigMutation) EdgeCleared(name string) bool {
-	switch name {
-	case psconfig.EdgeStrategy:
-		return m.clearedstrategy
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *PsConfigMutation) ClearEdge(name string) error {
-	switch name {
-	case psconfig.EdgeStrategy:
-		m.ClearStrategy()
-		return nil
-	}
 	return fmt.Errorf("unknown PsConfig unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *PsConfigMutation) ResetEdge(name string) error {
-	switch name {
-	case psconfig.EdgeStrategy:
-		m.ResetStrategy()
-		return nil
-	}
 	return fmt.Errorf("unknown PsConfig edge %s", name)
 }
 

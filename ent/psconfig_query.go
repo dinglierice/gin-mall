@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"mall/ent/predicate"
 	"mall/ent/psconfig"
-	"mall/ent/psstrategy"
 	"math"
 
 	"entgo.io/ent"
@@ -19,11 +18,10 @@ import (
 // PsConfigQuery is the builder for querying PsConfig entities.
 type PsConfigQuery struct {
 	config
-	ctx          *QueryContext
-	order        []psconfig.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.PsConfig
-	withStrategy *PsStrategyQuery
+	ctx        *QueryContext
+	order      []psconfig.OrderOption
+	inters     []Interceptor
+	predicates []predicate.PsConfig
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,28 +56,6 @@ func (pcq *PsConfigQuery) Unique(unique bool) *PsConfigQuery {
 func (pcq *PsConfigQuery) Order(o ...psconfig.OrderOption) *PsConfigQuery {
 	pcq.order = append(pcq.order, o...)
 	return pcq
-}
-
-// QueryStrategy chains the current query on the "strategy" edge.
-func (pcq *PsConfigQuery) QueryStrategy() *PsStrategyQuery {
-	query := (&PsStrategyClient{config: pcq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pcq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := pcq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(psconfig.Table, psconfig.FieldID, selector),
-			sqlgraph.To(psstrategy.Table, psstrategy.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, psconfig.StrategyTable, psconfig.StrategyColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(pcq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first PsConfig entity from the query.
@@ -269,27 +245,15 @@ func (pcq *PsConfigQuery) Clone() *PsConfigQuery {
 		return nil
 	}
 	return &PsConfigQuery{
-		config:       pcq.config,
-		ctx:          pcq.ctx.Clone(),
-		order:        append([]psconfig.OrderOption{}, pcq.order...),
-		inters:       append([]Interceptor{}, pcq.inters...),
-		predicates:   append([]predicate.PsConfig{}, pcq.predicates...),
-		withStrategy: pcq.withStrategy.Clone(),
+		config:     pcq.config,
+		ctx:        pcq.ctx.Clone(),
+		order:      append([]psconfig.OrderOption{}, pcq.order...),
+		inters:     append([]Interceptor{}, pcq.inters...),
+		predicates: append([]predicate.PsConfig{}, pcq.predicates...),
 		// clone intermediate query.
 		sql:  pcq.sql.Clone(),
 		path: pcq.path,
 	}
-}
-
-// WithStrategy tells the query-builder to eager-load the nodes that are connected to
-// the "strategy" edge. The optional arguments are used to configure the query builder of the edge.
-func (pcq *PsConfigQuery) WithStrategy(opts ...func(*PsStrategyQuery)) *PsConfigQuery {
-	query := (&PsStrategyClient{config: pcq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	pcq.withStrategy = query
-	return pcq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -368,11 +332,8 @@ func (pcq *PsConfigQuery) prepareQuery(ctx context.Context) error {
 
 func (pcq *PsConfigQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*PsConfig, error) {
 	var (
-		nodes       = []*PsConfig{}
-		_spec       = pcq.querySpec()
-		loadedTypes = [1]bool{
-			pcq.withStrategy != nil,
-		}
+		nodes = []*PsConfig{}
+		_spec = pcq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*PsConfig).scanValues(nil, columns)
@@ -380,7 +341,6 @@ func (pcq *PsConfigQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ps
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &PsConfig{config: pcq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -392,46 +352,7 @@ func (pcq *PsConfigQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ps
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := pcq.withStrategy; query != nil {
-		if err := pcq.loadStrategy(ctx, query, nodes, nil,
-			func(n *PsConfig, e *PsStrategy) { n.Edges.Strategy = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (pcq *PsConfigQuery) loadStrategy(ctx context.Context, query *PsStrategyQuery, nodes []*PsConfig, init func(*PsConfig), assign func(*PsConfig, *PsStrategy)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*PsConfig)
-	for i := range nodes {
-		if nodes[i].PsStrategy == nil {
-			continue
-		}
-		fk := *nodes[i].PsStrategy
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(psstrategy.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "ps_strategy" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (pcq *PsConfigQuery) sqlCount(ctx context.Context) (int, error) {
@@ -458,9 +379,6 @@ func (pcq *PsConfigQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != psconfig.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if pcq.withStrategy != nil {
-			_spec.Node.AddColumnOnce(psconfig.FieldPsStrategy)
 		}
 	}
 	if ps := pcq.predicates; len(ps) > 0 {

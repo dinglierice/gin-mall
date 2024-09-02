@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"mall/ent/psconfig"
-	"mall/ent/psstrategy"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -46,12 +45,6 @@ func (pcc *PsConfigCreate) SetNillableUpdateTime(t *time.Time) *PsConfigCreate {
 	if t != nil {
 		pcc.SetUpdateTime(*t)
 	}
-	return pcc
-}
-
-// SetPsID sets the "ps_id" field.
-func (pcc *PsConfigCreate) SetPsID(i int) *PsConfigCreate {
-	pcc.mutation.SetPsID(i)
 	return pcc
 }
 
@@ -165,23 +158,10 @@ func (pcc *PsConfigCreate) SetNillableUpdateUser(i *int) *PsConfigCreate {
 	return pcc
 }
 
-// SetStrategyID sets the "strategy" edge to the PsStrategy entity by ID.
-func (pcc *PsConfigCreate) SetStrategyID(id int) *PsConfigCreate {
-	pcc.mutation.SetStrategyID(id)
+// SetID sets the "id" field.
+func (pcc *PsConfigCreate) SetID(i int) *PsConfigCreate {
+	pcc.mutation.SetID(i)
 	return pcc
-}
-
-// SetNillableStrategyID sets the "strategy" edge to the PsStrategy entity by ID if the given value is not nil.
-func (pcc *PsConfigCreate) SetNillableStrategyID(id *int) *PsConfigCreate {
-	if id != nil {
-		pcc = pcc.SetStrategyID(*id)
-	}
-	return pcc
-}
-
-// SetStrategy sets the "strategy" edge to the PsStrategy entity.
-func (pcc *PsConfigCreate) SetStrategy(p *PsStrategy) *PsConfigCreate {
-	return pcc.SetStrategyID(p.ID)
 }
 
 // Mutation returns the PsConfigMutation object of the builder.
@@ -237,14 +217,6 @@ func (pcc *PsConfigCreate) check() error {
 	if _, ok := pcc.mutation.UpdateTime(); !ok {
 		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "PsConfig.update_time"`)}
 	}
-	if _, ok := pcc.mutation.PsID(); !ok {
-		return &ValidationError{Name: "ps_id", err: errors.New(`ent: missing required field "PsConfig.ps_id"`)}
-	}
-	if v, ok := pcc.mutation.PsID(); ok {
-		if err := psconfig.PsIDValidator(v); err != nil {
-			return &ValidationError{Name: "ps_id", err: fmt.Errorf(`ent: validator failed for field "PsConfig.ps_id": %w`, err)}
-		}
-	}
 	if _, ok := pcc.mutation.PsScene(); !ok {
 		return &ValidationError{Name: "ps_scene", err: errors.New(`ent: missing required field "PsConfig.ps_scene"`)}
 	}
@@ -255,6 +227,11 @@ func (pcc *PsConfigCreate) check() error {
 	}
 	if _, ok := pcc.mutation.PsFilter(); !ok {
 		return &ValidationError{Name: "ps_filter", err: errors.New(`ent: missing required field "PsConfig.ps_filter"`)}
+	}
+	if v, ok := pcc.mutation.ID(); ok {
+		if err := psconfig.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "PsConfig.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -270,8 +247,10 @@ func (pcc *PsConfigCreate) sqlSave(ctx context.Context) (*PsConfig, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	pcc.mutation.id = &_node.ID
 	pcc.mutation.done = true
 	return _node, nil
@@ -282,6 +261,10 @@ func (pcc *PsConfigCreate) createSpec() (*PsConfig, *sqlgraph.CreateSpec) {
 		_node = &PsConfig{config: pcc.config}
 		_spec = sqlgraph.NewCreateSpec(psconfig.Table, sqlgraph.NewFieldSpec(psconfig.FieldID, field.TypeInt))
 	)
+	if id, ok := pcc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := pcc.mutation.CreateTime(); ok {
 		_spec.SetField(psconfig.FieldCreateTime, field.TypeTime, value)
 		_node.CreateTime = value
@@ -289,10 +272,6 @@ func (pcc *PsConfigCreate) createSpec() (*PsConfig, *sqlgraph.CreateSpec) {
 	if value, ok := pcc.mutation.UpdateTime(); ok {
 		_spec.SetField(psconfig.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = value
-	}
-	if value, ok := pcc.mutation.PsID(); ok {
-		_spec.SetField(psconfig.FieldPsID, field.TypeInt, value)
-		_node.PsID = value
 	}
 	if value, ok := pcc.mutation.PsScene(); ok {
 		_spec.SetField(psconfig.FieldPsScene, field.TypeString, value)
@@ -314,6 +293,10 @@ func (pcc *PsConfigCreate) createSpec() (*PsConfig, *sqlgraph.CreateSpec) {
 		_spec.SetField(psconfig.FieldPsFeature, field.TypeInt, value)
 		_node.PsFeature = &value
 	}
+	if value, ok := pcc.mutation.PsStrategy(); ok {
+		_spec.SetField(psconfig.FieldPsStrategy, field.TypeInt, value)
+		_node.PsStrategy = &value
+	}
 	if value, ok := pcc.mutation.OwnerID(); ok {
 		_spec.SetField(psconfig.FieldOwnerID, field.TypeInt, value)
 		_node.OwnerID = &value
@@ -325,23 +308,6 @@ func (pcc *PsConfigCreate) createSpec() (*PsConfig, *sqlgraph.CreateSpec) {
 	if value, ok := pcc.mutation.UpdateUser(); ok {
 		_spec.SetField(psconfig.FieldUpdateUser, field.TypeInt, value)
 		_node.UpdateUser = &value
-	}
-	if nodes := pcc.mutation.StrategyIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   psconfig.StrategyTable,
-			Columns: []string{psconfig.StrategyColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(psstrategy.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.PsStrategy = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -391,7 +357,7 @@ func (pccb *PsConfigCreateBulk) Save(ctx context.Context) ([]*PsConfig, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}
