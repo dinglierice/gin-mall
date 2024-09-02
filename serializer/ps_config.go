@@ -1,6 +1,7 @@
 package serializer
 
 import (
+	"mall/ent"
 	"mall/repository/db/model"
 	"time"
 )
@@ -34,9 +35,31 @@ func BuildPsConfig(item *model.PsConfig) PsConfig {
 	}
 }
 
+func BuildPsConfig2(item *ent.PsConfig) PsConfig {
+	return PsConfig{
+		PsID:       item.PsID,
+		PSName:     item.PsScene,
+		PSFilter:   item.PsFilter,
+		PSMessage:  item.PsMessage,
+		PSEvent:    item.PsEvent,
+		PSFeature:  item.PsFeature,
+		PSStrategy: item.PsStrategy,
+		OwnerID:    item.OwnerID,
+		Managers:   item.Managers,
+	}
+}
+
 func BuildPsConfigs(items []*model.PsConfig) (configs []PsConfig) {
 	for _, item := range items {
 		config := BuildPsConfig(item)
+		configs = append(configs, config)
+	}
+	return configs
+}
+
+func BuildPsConfigs4Ent(items []*ent.PsConfig) (configs []PsConfig) {
+	for _, item := range items {
+		config := BuildPsConfig2(item)
 		configs = append(configs, config)
 	}
 	return configs

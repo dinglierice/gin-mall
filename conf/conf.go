@@ -2,7 +2,6 @@ package conf
 
 import (
 	"fmt"
-
 	"gopkg.in/ini.v1"
 )
 

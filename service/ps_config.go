@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"mall/ent"
 	dao2 "mall/repository/db/dao"
+	"mall/repository/db/entcl"
 	model2 "mall/repository/db/model"
 	"mall/serializer"
 	"sync"
@@ -44,4 +46,21 @@ func (service PsConfigService) List(ctx context.Context) interface{} {
 	}()
 	wg.Wait()
 	return serializer.BuildListResponse(serializer.BuildPsConfigs(psConfigs), uint(len(psConfigs)))
+}
+
+func (service PsConfigService) List2(ctx context.Context) interface{} {
+	var configs []*ent.PsConfig
+
+	if service.PageSize == 0 {
+		service.PageSize = 15
+	}
+
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	go func() {
+		configs, _ = entcl.GetPaginatedPsConfigs(ctx, service.PageNum, service.PageSize)
+		wg.Done()
+	}()
+	wg.Wait()
+	return serializer.BuildListResponse(serializer.BuildPsConfigs4Ent(configs), uint(len(configs)))
 }
