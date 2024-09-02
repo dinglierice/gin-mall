@@ -13,3 +13,7 @@ func GetPaginatedPsConfigs(ctx context.Context, limit, offset int) ([]*ent.PsCon
 		Offset(offset).
 		All(ctx)
 }
+
+func GetPsConfig(ctx context.Context, id int) (*ent.PsConfig, error) {
+	return entCli.PsConfig.Get(ctx, id)
+}

@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	logging "github.com/sirupsen/logrus"
 	"mall/ent"
-	dao2 "mall/repository/db/dao"
+	"mall/pkg/e"
 	"mall/repository/db/entcl"
 	model2 "mall/repository/db/model"
 	"mall/serializer"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -28,27 +30,6 @@ type PsConfigService struct {
 }
 
 func (service PsConfigService) List(ctx context.Context) interface{} {
-	var psConfigs []*model2.PsConfig
-
-	// 查询条件，待添加
-	condition := make(map[string]interface{})
-
-	if service.PageSize == 0 {
-		service.PageSize = 15
-	}
-
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
-	go func() {
-		psConfigDao := dao2.NewPsConfigDao(ctx)
-		psConfigs, _ = psConfigDao.ListPsConfigByCondition(condition, service.BasePage)
-		wg.Done()
-	}()
-	wg.Wait()
-	return serializer.BuildListResponse(serializer.BuildPsConfigs(psConfigs), uint(len(psConfigs)))
-}
-
-func (service PsConfigService) List2(ctx context.Context) interface{} {
 	var configs []*ent.PsConfig
 
 	if service.PageSize == 0 {
@@ -62,4 +43,25 @@ func (service PsConfigService) List2(ctx context.Context) interface{} {
 	}()
 	wg.Wait()
 	return serializer.BuildListResponse(serializer.BuildPsConfigs4Ent(configs), uint(len(configs)))
+}
+
+func (service PsConfigService) Show(ctx context.Context, param string) interface{} {
+	id, _ := strconv.Atoi(param)
+	code := e.SUCCESS
+	config, err := entcl.GetPsConfig(ctx, id)
+	if err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+
+	return serializer.Response{
+		Status: code,
+		Data:   serializer.BuildPsConfig(config),
+		Msg:    e.GetMsg(code),
+	}
 }

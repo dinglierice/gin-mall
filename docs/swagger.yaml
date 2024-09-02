@@ -9,6 +9,18 @@ definitions:
       status:
         type: integer
     type: object
+  service.UserService:
+    properties:
+      key:
+        description: 前端进行判断
+        type: string
+      nick_name:
+        type: string
+      password:
+        type: string
+      user_name:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -27,6 +39,27 @@ paths:
       summary: List products
       tags:
       - products
+  /api/v1/ps_config/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single psConfig by ID
+      parameters:
+      - description: PsConfig ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.Response'
+      summary: Get a psConfig
+      tags:
+      - psConfigs
   /api/v1/ps_configs:
     get:
       consumes:
@@ -42,4 +75,68 @@ paths:
       summary: List psConfigs
       tags:
       - psConfigs
+  /api/v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserService'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/serializer.Response'
+      summary: User login
+      tags:
+      - users
+  /api/v1/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the provided information
+      parameters:
+      - description: User registration information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserService'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully registered
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/serializer.Response'
+      summary: Register a new user
+      tags:
+      - users
 swagger: "2.0"

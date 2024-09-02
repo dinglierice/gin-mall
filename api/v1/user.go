@@ -8,6 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// UserRegister godoc
+// @Summary      Register a new user
+// @Description  Register a new user with the provided information
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user  body      service.UserService  true  "User registration information"
+// @Success      200   {object}  serializer.Response  "Successfully registered"
+// @Failure      400   {object}  serializer.Response        "Bad request"
+// @Failure      500   {object}  serializer.Response        "Internal server error"
+// @Router       /api/v1/user/register [post]
 func UserRegister(c *gin.Context) {
 	var userRegisterService service.UserService //相当于创建了一个UserRegisterService对象，调用这个对象中的Register方法。
 	if err := c.ShouldBind(&userRegisterService); err == nil {
@@ -19,7 +30,18 @@ func UserRegister(c *gin.Context) {
 	}
 }
 
-// UserLogin 用户登陆接口
+// UserLogin godoc
+// @Summary      User login
+// @Description  Authenticate a user and return a token
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user  body      service.UserService  true  "User login credentials"
+// @Success      200   {object}  serializer.Response  "Login successful"
+// @Failure      400   {object}  serializer.Response        "Bad request"
+// @Failure      401   {object}  serializer.Response        "Unauthorized"
+// @Failure      500   {object}  serializer.Response        "Internal server error"
+// @Router       /api/v1/user/login [post]
 func UserLogin(c *gin.Context) {
 	var userLoginService service.UserService
 	if err := c.ShouldBind(&userLoginService); err == nil {

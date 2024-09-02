@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 )
@@ -56,14 +57,14 @@ func (PsConfig) Fields() []ent.Field {
 }
 
 // Edges of the PsConfig.
-//func (PsConfig) Edges() []ent.Edge {
-//	return []ent.Edge{
-//		edge.To("strategy", PsStrategy.Type).
-//			Unique().
-//			Field("ps_strategy").
-//			Comment("关联的策略脚本"),
-//	}
-//}
+func (PsConfig) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("strategy", PsStrategy.Type).
+			Unique().
+			Field("id").
+			Comment("关联的策略脚本"),
+	}
+}
 
 // Mixin of the PsConfig.
 func (PsConfig) Mixin() []ent.Mixin {

@@ -11,7 +11,7 @@ import (
 	"mall/middleware"
 )
 
-// 路由配置
+// NewRouter 路由配置
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 	store := cookie.NewStore([]byte("something-very-secret"))
@@ -38,7 +38,8 @@ func NewRouter() *gin.Engine {
 		v1.GET("carousels", api.ListCarousels)   // 轮播图
 
 		// 脚本操作
-		v1.GET("ps_configs", api.ListPsConfig)
+		v1.GET("ps_configs", api.ListPsConfigs)
+		v1.GET("ps_config/:id", api.ShowPsConfig)
 
 		authed := v1.Group("/") // 需要登陆保护
 		authed.Use(middleware.JWT())
@@ -88,6 +89,7 @@ func NewRouter() *gin.Engine {
 			authed.POST("import_skill_goods", api.ImportSkillGoods)
 			authed.POST("init_skill_goods", api.InitSkillGoods)
 			authed.POST("skill_goods", api.SkillGoods)
+
 		}
 	}
 	return r
