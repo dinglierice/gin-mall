@@ -13,7 +13,7 @@ var (
 )
 
 func InitEntClient() {
-	drv, err := sql.Open("mysql", "root:123456@tcp(localhost:3306)/mall_db?parseTime=True")
+	drv, err := sql.Open("mysql", "root:123456@tcp(localhost:3306)/mall_db?parseTime=True&loc=Asia%2FShanghai")
 	if err != nil {
 		log.Fatalf("failed opening connection to mysql: %v", err)
 	}

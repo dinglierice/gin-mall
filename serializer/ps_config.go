@@ -46,6 +46,8 @@ func BuildPsConfig2(item *ent.PsConfig) PsConfig {
 		PSStrategy: item.PsStrategy,
 		OwnerID:    item.OwnerID,
 		Managers:   item.Managers,
+		CreateTime: item.CreateTime,
+		UpdateTime: item.UpdateTime,
 	}
 }
 
