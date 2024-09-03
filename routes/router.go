@@ -37,9 +37,13 @@ func NewRouter() *gin.Engine {
 		v1.GET("categories", api.ListCategories) // 商品分类
 		v1.GET("carousels", api.ListCarousels)   // 轮播图
 
-		// 脚本操作
+		// ppl操作
 		v1.GET("ps_configs", api.ListPsConfigs)
 		v1.GET("ps_config/:id", api.ShowPsConfig)
+
+		// 策略操作
+		v1.GET("ps_strategies", api.ListPsStrategies)
+		v1.GET("ps_strategy/:id", api.ShowPsStrategy)
 
 		authed := v1.Group("/") // 需要登陆保护
 		authed.Use(middleware.JWT())
@@ -90,6 +94,8 @@ func NewRouter() *gin.Engine {
 			authed.POST("init_skill_goods", api.InitSkillGoods)
 			authed.POST("skill_goods", api.SkillGoods)
 
+			// 策略操作
+			authed.POST("ps_strategy", api.CreatePsStrategy)
 		}
 	}
 	return r

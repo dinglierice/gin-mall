@@ -75,6 +75,63 @@ paths:
       summary: List psConfigs
       tags:
       - psConfigs
+  /api/v1/ps_strategies:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all PS strategies
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/serializer.Response'
+      summary: List PS strategies
+      tags:
+      - psStrategies
+  /api/v1/ps_strategy/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific PS strategy by ID
+      parameters:
+      - description: PS Strategy ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/serializer.Response'
+        "404":
+          description: PS Strategy not found
+          schema:
+            $ref: '#/definitions/serializer.Response'
+      summary: Show a PS strategy
+      tags:
+      - psStrategies
   /api/v1/user/login:
     post:
       consumes:
