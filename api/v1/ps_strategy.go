@@ -51,11 +51,12 @@ func ShowPsStrategy(c *gin.Context) {
 	}
 }
 
+// TODO 待完善CREATE接口
 func CreatePsStrategy(c *gin.Context) {
 	var createStrategyService service.PsStrategyService
 	claims, _ := util.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&createStrategyService); err == nil {
-		res := createStrategyService.Create(c.Request.Context(), claims.ID)
+		res := createStrategyService.Create(c.Request.Context(), &createStrategyService, claims.ID)
 		c.JSON(consts.StatusOK, res)
 	} else {
 		c.JSON(consts.IlleageRequest, ErrorResponse(err))

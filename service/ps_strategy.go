@@ -60,44 +60,36 @@ func (service *PsStrategyService) Show(ctx context.Context, param string) interf
 	}
 }
 
-func (service *PsStrategyService) Create(ctx context.Context, id uint) serializer.Response {
-	//var user *ent.PsStrategy
-	//var err error
-	//code := e.SUCCESS
-	// 找到用户
-	//userDao := dao2.NewUserDao(ctx)
-	//user, err = userDao.GetUserById(uId)
-	//if err != nil {
-	//	logging.Info(err)
-	//	code = e.ErrorDatabase
-	//	return serializer.Response{
-	//		Status: code,
-	//		Msg:    e.GetMsg(code),
-	//		Error:  err.Error(),
-	//	}
-	//}
-	//if service.NickName != "" {
-	//	user.NickName = service.NickName
-	//}
-	//
-	//err = userDao.UpdateUserById(uId, user)
-	//if err != nil {
-	//	logging.Info(err)
-	//	code = e.ErrorDatabase
-	//	return serializer.Response{
-	//		Status: code,
-	//		Msg:    e.GetMsg(code),
-	//		Error:  err.Error(),
-	//	}
-	//}
-	//
-	//return serializer.Response{
-	//	Status: code,
-	//	Data:   serializer.BuildUser(user),
-	//	Msg:    e.GetMsg(code),
-	//}
+func (service *PsStrategyService) Create(ctx context.Context, createPsStrategyService *PsStrategyService, claimId uint) serializer.Response {
+	var _ *ent.PsStrategy
+	var err error
+	code := e.SUCCESS
+
+	// 判断有无这个商品
+	_, err = entcl.GetPsStrategy(ctx, service.ID)
+	if err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+
+	// 创建购物车
+	err = entcl.CreateStrategy(ctx, createPsStrategyService, claimId)
+	if err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
 	return serializer.Response{
-		Status: e.SUCCESS,
-		Msg:    e.GetMsg(e.SUCCESS),
+		Status: code,
+		Msg:    e.GetMsg(code),
 	}
 }
